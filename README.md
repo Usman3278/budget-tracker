@@ -22,7 +22,7 @@ SO THAT my account balance is accurate when I am traveling
 
 # Link to Deployed App
 
-# Link to deployed app (https://cryptic-island-85185.herokuapp.com/)
+# Link to deployed app ()
 
 # GitHub Repo:
 https://github.com/Usman3278/budget-tracker
