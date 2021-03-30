@@ -15,7 +15,7 @@ fetch("/api/transaction")
   });
 
 function populateTotal() {
-  
+  //Reduce transaction amounts to a single total value
   let total = transactions.reduce((total, t) => {
     return total + parseInt(t.value);
   }, 0);
@@ -45,7 +45,7 @@ function populateChart() {
   let reversed = transactions.slice().reverse();
   let sum = 0;
 
-  //Create date labels
+  //Create date labels for chart
   let labels = reversed.map(t => {
     let date = new Date(t.date);
     return `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
@@ -57,7 +57,7 @@ function populateChart() {
     return sum;
   });
 
-  //Remove old chart
+  //Remove old chart if it exists
   if (myChart) {
     myChart.destroy();
   }
@@ -83,7 +83,7 @@ function sendTransaction(isAdding) {
   let amountEl = document.querySelector("#t-amount");
   let errorEl = document.querySelector(".form .error");
 
-  //Validate form
+  // validate form
   if (nameEl.value === "" || amountEl.value === "") {
     errorEl.textContent = "Missing Information";
     return;
@@ -99,20 +99,20 @@ function sendTransaction(isAdding) {
     date: new Date().toISOString()
   };
 
-  
+  //If subtracting funds convert amount to a negative number
   if (!isAdding) {
     transaction.value *= -1;
   }
 
-  
+  //Add to beginning of current array of data
   transactions.unshift(transaction);
 
-
+  //Re-run logic to populate ui with new record
   populateChart();
   populateTable();
   populateTotal();
   
- 
+  //Send to server
   fetch("/api/transaction", {
     method: "POST",
     body: JSON.stringify(transaction),
@@ -129,20 +129,41 @@ function sendTransaction(isAdding) {
       errorEl.textContent = "Missing Information";
     }
     else {
-
-      //Clear the Form
+      //Clear form
       nameEl.value = "";
       amountEl.value = "";
     }
   })
   .catch(err => {
-   
+    //Fetch failed save in indexed db
     saveRecord(transaction);
 
-    //Clear Form
+    //Clear form
     nameEl.value = "";
     amountEl.value = "";
   });
+}
+
+//Delete
+function clear() {
+  fetch("/api/transaction", {
+    method: "DELETE"
+  })
+    .then(function(response) {
+      if (response.status !== 200) {
+         console.log ("status code: " + response.status);
+        return;
+      }
+      clearTable();
+    })
+    .catch(function(err) {
+      console.log("Fetch Error :-S", err);
+    });
+}
+
+function clearTable() {
+  let tbody = document.querySelector("#tbody");
+  tbody.empty();
 }
 
 document.querySelector("#add-btn").onclick = function() {
@@ -151,4 +172,9 @@ document.querySelector("#add-btn").onclick = function() {
 
 document.querySelector("#sub-btn").onclick = function() {
   sendTransaction(false);
+};
+
+document.querySelector("#del-btn").onclick = function() {
+  clear();
+  location.reload();
 };
