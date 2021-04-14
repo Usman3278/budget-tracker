@@ -1,13 +1,3 @@
-
-const IndexedDB = 
-window.indexedDB ||
-window.mozIndexDB ||
-window.webkitIndexedDB ||
-window.msIndexedDB ||
-window.shimIndexedDB;
-
-
-
 let db;
 // create a new db request for a "budget" database.
 const request = indexedDB.open("budget", 1);
@@ -28,7 +18,7 @@ request.onsuccess = function(event) {
 };
 
 request.onerror = function(event) {
-  console.log("Woops, Error: " + event.target.errorCode);
+  console.log("Woops! " + event.target.errorCode);
 };
 
 function saveRecord(record) {
